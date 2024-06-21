@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+p, strong {
+  @apply mb-2;
+}
+
+li {
+  @apply list-disc ml-4 mb-2;
+}

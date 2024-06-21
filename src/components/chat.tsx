@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-
+import Markdown from 'react-markdown'
 interface ChatType {
     role: string
     text: string
@@ -13,38 +13,36 @@ const ChatComponent = () => {
 
     const handleSendMessage = async () => {
         setIsLoading(true)
+        setMessage('') // Clear the input
         // Add the user message to the chat history
         const updatedHistory = [...chatHistory, { role: 'user', text: message }]
         setChatHistory(updatedHistory)
 
-        const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message, history: updatedHistory })
-        })
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message, history: updatedHistory })
+            })
+            // @ts-ignore
+            if (res.error) {
+                alert('Failed to send message')
+                setIsLoading(false)
+                return
+            }
+            const data = await res.json()
+            // Add the model response to the chat history
+            setChatHistory([
+                ...updatedHistory,
+                { role: 'model', text: data.response }
+            ])
+        } catch (error) {
+            alert('Failed to send message')
+        }
 
-        const data = await res.json()
-
-        // Add the model response to the chat history
-        setChatHistory([
-            ...updatedHistory,
-            { role: 'model', text: data.response }
-        ])
-        setMessage('') // Clear the input
         setIsLoading(false)
-    }
-
-    // Fungsi untuk memformat respons agar mendukung HTML
-    const formatResponse = (response: string) => {
-        return response
-            .replace(/\n\n/g, '<br/><br/>')
-            .replace(/\n/g, '<br/>')
-            .replace(
-                /\* \*\*(.+?)\*\*\:(.+?)<br\/>/g,
-                '<strong>$1</strong>: $2<br/>'
-            )
     }
 
     return (
@@ -59,21 +57,17 @@ const ChatComponent = () => {
                                 ? 'bg-blue-100 text-right'
                                 : 'bg-gray-100 text-left'
                         }`}>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: formatResponse(chat.text)
-                            }}
-                        />
+                        <Markdown>{chat.text}</Markdown>
                     </div>
                 ))}
                 {isLoading && (
-                   <div className="mb-2 p-4 rounded bg-gray-100 text-left animate-pulse">
-                    <div className="flex gap-2 items-center">
-                        <div className="w-2 h-2 rounded-full bg-zinc-200"></div>
-                        <div className="w-2 h-2 rounded-full bg-zinc-200"></div>
-                        <div className="w-2 h-2 rounded-full bg-zinc-200"></div>
+                    <div className='mb-2 p-4 rounded bg-gray-100 text-left animate-pulse'>
+                        <div className='flex gap-2 items-center'>
+                            <div className='w-2 h-2 rounded-full bg-zinc-200'></div>
+                            <div className='w-2 h-2 rounded-full bg-zinc-200'></div>
+                            <div className='w-2 h-2 rounded-full bg-zinc-200'></div>
+                        </div>
                     </div>
-                   </div>
                 )}
             </div>
             <div className=''>
