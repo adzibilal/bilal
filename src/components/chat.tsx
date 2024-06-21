@@ -11,6 +11,9 @@ const ChatComponent = () => {
     const [chatHistory, setChatHistory] = useState<ChatType[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
+    const openingMessage =
+        'Hai! 👋 \n\nAku adalah Bilal, asisten virtual Adzi Bilal. Aku di sini untuk membantunya dalam hal-hal seperti:\n\n* **Memberikan informasi tentang Adzi:** Pengalamannya, keahliannya, dan proyek-proyek yang pernah ia kerjakan.\n* **Menjawab pertanyaan seputar frontend development:**  HTML, CSS, Javascript, React, dan lainnya. \n* **Membantu mengatur jadwal Adzi:** Jika kamu ingin membuat janji temu.\n\nIntinya, aku di sini untuk mempermudah komunikasi dengan Adzi, terutama yang berkaitan dengan pekerjaan dan keahliannya. 😊\n\nAda yang bisa kubantu? \n'
+
     const handleSendMessage = async () => {
         setIsLoading(true)
         setMessage('') // Clear the input
@@ -48,7 +51,10 @@ const ChatComponent = () => {
     return (
         <div className='max-w-screen-md mx-auto w-full p-4 grid grid-rows-[36px_1fr_160px] h-full'>
             <h1 className='text-2xl font-bold mb-4'>Chat dengan Bilal</h1>
-            <div className='rounded-lg p-4 mb-4 overflow-y-auto'>
+            <div className='rounded-lg mb-4 overflow-y-auto'>
+                <div className='mb-2 p-2 rounded bg-gray-100 text-left'>
+                    <Markdown>{openingMessage}</Markdown>
+                </div>
                 {chatHistory.map((chat: ChatType, index) => (
                     <div
                         key={index}
